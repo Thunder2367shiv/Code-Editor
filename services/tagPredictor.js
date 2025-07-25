@@ -1,11 +1,11 @@
-// services/tagPredictor.js
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
- 
+
+// Use a valid model like gemini-1.5-flash or gemini-1.5-pro
 export const predictTag = async (code) => {
   const prompt = `
 You are an expert DSA tutor.
@@ -18,9 +18,12 @@ ${code}
 \`\`\`
 `;
 
-  const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-  const result = await model.generateContent(prompt);
+  const result = await model.generateContent({
+    contents: [{ parts: [{ text: prompt }] }],
+  });
+
   const response = await result.response;
   const text = response.text().trim();
 

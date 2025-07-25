@@ -6,25 +6,40 @@ dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Use a valid model like gemini-1.5-flash or gemini-1.5-pro
 export const suggestFix = async (code, error) => {
   const prompt = `
-You are a programming assistant.
-The user ran the following code and got an error.
-Please explain the reason for the error and suggest a fix.
- 
+You are a helpful programming assistant.
+A user ran the following code and encountered an error.
+Please:
+1. Explain the cause of the error.
+2. Suggest a fix.
+3. Optionally, provide the corrected code.
+
 Code:
 \`\`\`
 ${code}
 \`\`\`
 
-Error Message:
+Error:
+\`\`\`
 ${error}
-
-Respond with a detailed explanation and a corrected version of the code if possible.
+\`\`\`
 `;
 
-  const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  return response.text().trim();
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+    const result = await model.generateContent({
+      contents: [{ parts: [{ text: prompt }] }],
+    });
+
+    const response = result.response;
+    const text = await response.text();
+
+    return text.trim();
+  } catch (err) {
+    console.error("Gemini ErrorFix Error:", err.message || err);
+    return `❌ Error: ${err.message || 'Could not generate fix.'}`;
+  }
 };
