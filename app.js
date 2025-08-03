@@ -2,7 +2,6 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
  
 // Route imports
@@ -11,8 +10,6 @@ import codeRoutes from './routes/codeRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import errorSuggestRoutes from './routes/errorSuggestRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
-
-dotenv.config();
 
 const app = express();
 

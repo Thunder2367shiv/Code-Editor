@@ -1,27 +1,18 @@
-// middlewares/authMiddleware.js
-import { verifyFirebaseToken } from '../config/firebase.js';
-import { User } from '../models/User.js';
+// middleware/requireAuth.js
+import jwt from 'jsonwebtoken';
 
-export const protect = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
+export const protect = (req, res, next) => {
+  const token = req.cookies.token;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'No token provided' });
-  } 
-
-  const token = authHeader.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'Access denied. No token provided.' });
+  }
 
   try {
-    const decoded = await verifyFirebaseToken(token);
-
-    const user = await User.findOne({ where: { uid: decoded.uid } });
-    if (!user) {
-      return res.status(401).json({ error: 'User not found' });
-    }
-
-    req.user = user; // Attach user to request
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // attach decoded user info
     next();
-  } catch (error) {
-    res.status(401).json({ error: 'Invalid token', details: error.message });
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid or expired token' });
   }
 };

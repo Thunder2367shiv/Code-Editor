@@ -17,7 +17,7 @@ export const CodeSnippet = sequelize.define('CodeSnippet', {
     allowNull: false,
   },
   tags: {
-    type: DataTypes.STRING, // comma-separated DSA tags
+    type: DataTypes.STRING,
     allowNull: true,
   },
 }, {
